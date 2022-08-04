@@ -19,9 +19,9 @@
   environment:
     USE_GKE_GCLOUD_AUTH_PLUGIN: True
   roles:
-    # - role: prerequisites
-    #   become: yes
-    #   become_method: sudo
-    # - role: install
+    - role: prerequisites
+      become: yes
+      become_method: sudo
+    - role: install
     - role: test
     
