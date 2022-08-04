@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+locals {
+  np_service_account_iam_email = [for k, v in module.cluster_nodepools : v.service_account_iam_email]
+}
+
 module "host_project" {
   source = "github.com/apichick/cloud-foundation-fabric.git//modules/project?ref=master"
   billing_account = (var.project_create != null
@@ -92,9 +96,13 @@ module "clusters_project" {
     "stackdriver.googleapis.com"
   ]
   iam = {
-    "roles/container.admin"     = [module.mgmt_server.service_account_iam_email]
-    "roles/gkehub.admin"        = [module.mgmt_server.service_account_iam_email]
-    "roles/gkehub.serviceAgent" = ["serviceAccount:${module.clusters_project.service_accounts.robots.fleet}"]
+    "roles/container.admin"                     = [module.mgmt_server.service_account_iam_email]
+    "roles/gkehub.admin"                        = [module.mgmt_server.service_account_iam_email]
+    "roles/gkehub.serviceAgent"                 = ["serviceAccount:${module.clusters_project.service_accounts.robots.fleet}"]
+    "roles/monitoring.viewer"                   = local.np_service_account_iam_email
+    "roles/monitoring.metricWriter"             = local.np_service_account_iam_email
+    "roles/logging.logWriter"                   = local.np_service_account_iam_email
+    "roles/stackdriver.resourceMetadata.writer" = local.np_service_account_iam_email
   }
   service_config = {
     disable_on_destroy         = false
